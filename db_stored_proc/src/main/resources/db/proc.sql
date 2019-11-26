@@ -1,0 +1,8 @@
+CREATE OR REPLACE
+PROCEDURE get_emp_rs (p_recordset OUT SYS_REFCURSOR) AS 
+BEGIN 
+  OPEN p_recordset FOR
+    SELECT EMPLOYEE_ID,FIRST_NAME,LAST_NAME
+    FROM   emp;
+END get_emp_rs;
+/

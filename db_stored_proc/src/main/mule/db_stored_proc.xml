@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="db_sp_cursorFlow" doc:id="68836fe2-0824-4b95-8cf7-f105f78e5cbf" >
+		<http:listener doc:name="Listener" doc:id="ea7a990e-41e0-47da-b75d-32916020a31e" path="/sp" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ec668037-9cbe-4fb6-b452-3bb44e8812b3" message="START OF FLOW"/>
+		<db:stored-procedure doc:name="Stored procedure" doc:id="7fb9926f-41ee-453c-a223-142bfca7c3af" config-ref="Database_Config">
+			<db:sql >{ call get_emp_rs(p_recordset =&gt; :CUR_EMP) }</db:sql>
+			<db:output-parameters>
+				<db:output-parameter key="CUR_EMP" customType="CURSOR" />
+			</db:output-parameters>
+		</db:stored-procedure>
+		<ee:transform doc:name="Transform Message" doc:id="937488d6-1c0a-498d-a673-53ab42e1a589" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.CUR_EMP map
+{
+	EMP_ID : $.EMPLOYEE_ID,
+	F_NAME: $.FIRST_NAME,
+	L_NAME: $.LAST_NAME	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="929ab5fb-063a-4191-9ab4-a0c9a9b9d781" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="64ee2f11-82ac-4527-9e56-331f66837739" message="END OF FLOW"/>
+	</flow>
+</mule>
