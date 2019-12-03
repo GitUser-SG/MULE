@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	
+	<flow name="archive-flow" doc:id="eda49eb7-f4f8-4114-aeaf-15ef4e5c6642" >
+		<http:listener doc:name="HTTP send zipped archive " doc:id="a65c089e-edc4-46bb-800a-bcccb76f534e" config-ref="HTTP_Listener_config" path="/zippedArchive" outputMimeType="application/json"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="e88293f0-ddf7-4508-8258-d6de1ce8f9cb" >
+			<route >
+				<http:request method="POST" doc:name="Request" doc:id="21af24ee-0b1d-448f-bcdc-90396ef53465" config-ref="HTTP_Request_configuration" path="/sendCompress" outputMimeType="application/json"/>
+			</route>
+			<route >
+				<http:request method="POST" doc:name="Request" doc:id="8810e58f-c4bc-4a46-b39b-77e308db7007" config-ref="HTTP_Request_configuration" path="/xml" outputMimeType="application/json"/>
+			</route>
+		</scatter-gather>
+		<compression:archive doc:name="Archive" doc:id="5c0631df-f6f1-4378-a451-917b184455e5" >
+			<compression:entries ><![CDATA[#[{
+	'json_details.json': payload[0].payload,
+	'xml_details.xml' : payload[1].payload
+	
+}]]]></compression:entries>
+			<compression:archiver >
+				<compression:zip-archiver />
+			</compression:archiver>
+		</compression:archive>
+		<logger level="INFO" doc:name="Logger" doc:id="cd1321b8-3c88-4009-a162-d4c99016d386" message="Archived"/>
+		<http:request method="POST" doc:name="HTTP Request to Extract back" doc:id="0e4f413a-0b27-4435-be85-1a4003f0c933" config-ref="HTTP_Request_configuration" path="/zippedExtract" outputMimeType="application/json"/>
+	</flow>
+	<flow name="extract-flow" doc:id="165adbe1-f780-45f7-a256-f4dca69927ac" >
+		<http:listener doc:name="HTTP Extract " doc:id="1fbb608b-3f93-491b-9674-a5f828783ae3" config-ref="HTTP_Listener_config" path="/zippedExtract"/>
+		<compression:extract doc:name="Extract payload" doc:id="af1abe26-07a2-412c-a529-5be94512f0d8" >
+			<compression:extractor >
+				<compression:zip-extractor />
+			</compression:extractor>
+		</compression:extract>
+		<ee:transform doc:name="payload in JSON" doc:id="c7b1fb2f-86e1-4aa3-a7a7-f8c275957cbf" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload mapObject 
+{
+	($$) : $
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="23cac134-ee06-41df-be06-99466b995ea7" message="#[payload]"/>
+	</flow>
+</mule>

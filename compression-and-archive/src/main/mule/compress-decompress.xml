@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:compression="http://www.mulesoft.org/schema/mule/compression" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+	
+	<flow name="compress-flow" doc:id="8cb43ba9-d365-4a42-8d24-fa3439321567" >
+		<http:listener doc:name="HTTP send compressed file" doc:id="e7b7e17d-1e6a-4f98-bc8b-98af4d9ccb7f" config-ref="HTTP_Listener_config" path="/sendCompress" outputMimeType="application/json"/>
+		<compression:compress doc:name="compresses payload - using zip compressor" doc:id="c8260001-6305-4341-9853-79ef1b5e72b5" >
+			<compression:compressor >
+				<compression:zip-compressor />
+			</compression:compressor>
+		</compression:compress>
+		<http:request method="POST" doc:name="Send Compressed payload" doc:id="590a2f61-2e2b-4e4c-a219-2bf3db86e229" config-ref="HTTP_Request_configuration" path="/sendDecompress" outputMimeType="multipart/x-zip"/>
+		<logger level="INFO" doc:name="Logger" doc:id="482be550-fbc4-4e2d-bbec-b7576a3460f0" message="Got payload back : #[payload]"/>
+	</flow>
+	<flow name="decompress-flow" doc:id="279d3508-6b8b-4918-926a-b03ad0999817" >
+		<http:listener doc:name="HTTP Decompress file and send back" doc:id="5dc49b45-1ad0-4ca5-b229-de00da032bd9" config-ref="HTTP_Listener_config" path="/sendDecompress"/>
+		<compression:decompress doc:name="decompress payload" doc:id="a037cf79-b676-43cf-881e-7287867a1c46" outputMimeType="application/json">
+			<compression:decompressor >
+				<compression:zip-decompressor />
+			</compression:decompressor>
+		</compression:decompress>
+		<logger level="INFO" doc:name="Logger" doc:id="296be1a9-802f-48cc-b3e6-0b09834fe7fd" message="Decompression done : #[payload]"/>
+	</flow>
+</mule>
