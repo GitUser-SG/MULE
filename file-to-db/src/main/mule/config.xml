@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<!-- Add your DB config here  -->
+<!-- 	<db:config name="Database_Config" doc:name="Database Config" doc:id="ebd2026e-b4ec-4689-bf52-65f019978618" > -->
+<!-- 		<db:oracle-connection host="${db.host}" port="${db.port}" user="${db.user}" password="${db.password}" serviceName="${db.servicename}" /> -->
+<!-- 	</db:config> -->
+<!-- End  DB config   -->
+	<configuration-properties doc:name="Configuration properties" doc:id="3cc4a74a-25ea-4ebc-a1a4-0c057194f737" file="config.yaml" />
+	
+	<file:config name="File_Config" doc:name="File Config" doc:id="bcad0836-e25e-4fd2-8a0d-d3dcbd9570ac" >
+		<file:connection workingDir="${mule.home}\apps\${app.name}\" />
+	</file:config>
+	
+</mule>
