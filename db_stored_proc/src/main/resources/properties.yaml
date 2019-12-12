@@ -1,6 +1,6 @@
 db:
-  hostname: ""
-  port: ""
-  username: ""
-  password: ""
-  servicename: ""
+  hostname: "localhost"
+  port: "1521"
+  username: "mytest"
+  password: "mytest"
+  servicename: "XE"

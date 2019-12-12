@@ -9,7 +9,12 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 		<http:listener-connection host="0.0.0.0" port="8085" />
 	</http:listener-config>
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="6c302646-5e0d-45cf-94b3-f41f47b4a050" >
-		<db:oracle-connection host="${db.hostname}" port="${db.port}" user="${db.username}" password="${db.password}" serviceName="${db.servicename}" />
+		<db:oracle-connection host="${db.hostname}" port="${db.port}" user="${db.username}" password="${db.password}" serviceName="${db.servicename}" >
+			<db:column-types >
+				<db:column-type id="2001" typeName="XXX_TBL" />
+				<db:column-type id="2002" typeName="XXX_RECORD" />
+			</db:column-types>
+		</db:oracle-connection>
 	</db:config>
 	<configuration-properties doc:name="Configuration properties" doc:id="8321a715-9fd2-4fd9-8231-39d08732d41d" file="properties.yaml" />
 </mule>
